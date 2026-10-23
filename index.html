@@ -23,7 +23,7 @@
       <p class="hint">In n8n, activate the workflow and copy the Production URL from the “Provision Webhook” node.</p>
       <div class="spacer"></div>
       <label class="field" for="gateway">Payment gateway</label>
-      <select id="gateway"><option value="paddle">Paddle</option><option value="stripe">Stripe</option><option value="lemonsqueezy">Lemon Squeezy</option></select>
+      <select id="gateway"><option value="paddle">Paddle</option><option value="stripe">Stripe</option></select>
       <p class="hint" id="gatewayHint"></p>
       <div class="spacer"></div>
       <label class="field" for="csvFile">CSV file</label>
@@ -44,7 +44,7 @@
 (() => {
   const $ = id => document.getElementById(id);
   const webhook = $('webhookUrl'), fileInput = $('csvFile'), uploadBtn = $('uploadBtn'), statusBox = $('status'), gateway = $('gateway'), gatewayHint = $('gatewayHint');
-  const hints = {paddle:'Creates a product and price in Paddle Sandbox.', stripe:'Creates a product and price in Stripe (use a test-mode secret key in n8n).', lemonsqueezy:'Lemon Squeezy\'s API cannot create products, so rows will be validated but not imported. Create them in the Lemon Squeezy dashboard.'};
+  const hints = {paddle:'Creates a product and price in Paddle Sandbox.', stripe:'Creates a product and price in Stripe (use a test-mode secret key in n8n).'};
   const showHint = () => { gatewayHint.textContent = hints[gateway.value]; };
   gateway.addEventListener('change', showHint); showHint();
   let lastRows = [];
