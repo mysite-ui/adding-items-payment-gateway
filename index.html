@@ -4,709 +4,87 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Paddle Sandbox CSV Importer</title>
-
   <style>
-    :root {
-      color-scheme: light;
-      --navy: #00296b;
-      --blue: #006ee1;
-      --yellow: #fbc000;
-      --ink: #152238;
-      --muted: #62718a;
-      --line: #dce4ef;
-      --bg: #f4f7fb;
-      --green: #087443;
-      --red: #b42318;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      font: 15px/1.5 Inter, ui-sans-serif, system-ui,
-        -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-    }
-
-    .wrap {
-      max-width: 920px;
-      margin: 40px auto;
-      padding: 0 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 13px;
-      background: var(--navy);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 850;
-      font-size: 20px;
-      box-shadow: 0 5px 15px #00296b25;
-    }
-
-    .brand small {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .brand strong {
-      font-size: 19px;
-      color: var(--navy);
-    }
-
-    .hero {
-      margin-bottom: 22px;
-    }
-
-    .hero h1 {
-      font-size: clamp(27px, 4vw, 38px);
-      line-height: 1.15;
-      color: var(--navy);
-      margin: 0 0 10px;
-      letter-spacing: -.035em;
-    }
-
-    .hero p {
-      margin: 0;
-      color: var(--muted);
-      max-width: 700px;
-    }
-
-    .panel {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 10px 35px #1b355b08;
-      margin: 18px 0;
-    }
-
-    .field {
-      display: block;
-      font-weight: 700;
-      margin: 0 0 8px;
-      color: #263b59;
-    }
-
-    input[type="url"],
-    input[type="file"] {
-      width: 100%;
-      border: 1px solid #cbd6e5;
-      border-radius: 10px;
-      background: #fff;
-      padding: 12px 13px;
-      font: inherit;
-      color: var(--ink);
-    }
-
-    input:focus {
-      outline: 3px solid #006ee125;
-      border-color: var(--blue);
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 13px;
-      margin: 7px 0 0;
-    }
-
-    .spacer {
-      height: 20px;
-    }
-
-    .drop {
-      border: 1.5px dashed #aebfd5;
-      background: #f9fbfe;
-      border-radius: 13px;
-      padding: 23px;
-      text-align: center;
-    }
-
-    .drop .symbol {
-      font-size: 28px;
-    }
-
-    .drop strong {
-      display: block;
-      color: var(--navy);
-      margin: 5px 0;
-    }
-
-    .drop input {
-      margin-top: 12px;
-      max-width: 100%;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 17px;
-      font: inherit;
-      font-weight: 750;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: var(--blue);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #0057b8;
-    }
-
-    .btn-primary:disabled {
-      opacity: .55;
-      cursor: wait;
-    }
-
-    .btn-secondary {
-      background: #edf2f8;
-      color: var(--navy);
-    }
-
-    .note {
-      padding: 13px 15px;
-      border-radius: 11px;
-      background: #fff8dc;
-      border: 1px solid #f4df8c;
-      color: #5e4a00;
-      font-size: 13px;
-      margin-top: 16px;
-    }
-
-    .status {
-      display: none;
-      padding: 13px 15px;
-      border-radius: 10px;
-      margin-top: 16px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .status.show {
-      display: block;
-    }
-
-    .status.info {
-      background: #eef5ff;
-      color: #17417c;
-    }
-
-    .status.ok {
-      background: #eaf8f0;
-      color: var(--green);
-    }
-
-    .status.err {
-      background: #fff0ef;
-      color: var(--red);
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin: 16px 0;
-    }
-
-    .metric {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      background: #fff;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 24px;
-      color: var(--navy);
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 14px;
-    }
-
-    th,
-    td {
-      text-align: left;
-      padding: 11px 10px;
-      border-bottom: 1px solid #e8edf4;
-      vertical-align: top;
-    }
-
-    th {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    code {
-      overflow-wrap: anywhere;
-      color: #244b7c;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 99px;
-      background: #e8f7ef;
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .tag.skip {
-      background: #fff3d5;
-      color: #785600;
-    }
-
-    .foot {
-      color: var(--muted);
-      font-size: 12px;
-      text-align: center;
-      margin: 22px 0 35px;
-    }
-
-    @media (max-width: 600px) {
-      .wrap {
-        margin: 24px auto;
-      }
-
-      .panel {
-        padding: 17px;
-      }
-
-      .summary {
-        grid-template-columns: 1fr;
-      }
-
-      .hero h1 {
-        font-size: 29px;
-      }
-    }
+    :root{color-scheme:light;--navy:#00296b;--blue:#006ee1;--yellow:#fbc000;--ink:#152238;--muted:#62718a;--line:#dce4ef;--bg:#f4f7fb;--green:#087443;--red:#b42318}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+    .wrap{max-width:920px;margin:40px auto;padding:0 18px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.logo{width:44px;height:44px;border-radius:13px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:850;font-size:20px;box-shadow:0 5px 15px #00296b25}.brand small{display:block;color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}.brand strong{font-size:19px;color:var(--navy)}
+    .hero{margin-bottom:22px}.hero h1{font-size:clamp(27px,4vw,38px);line-height:1.15;color:var(--navy);margin:0 0 10px;letter-spacing:-.035em}.hero p{margin:0;color:var(--muted);max-width:700px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 10px 35px #1b355b08;margin:18px 0}.field{display:block;font-weight:700;margin:0 0 8px;color:#263b59}input[type=url],input[type=file]{width:100%;border:1px solid #cbd6e5;border-radius:10px;background:#fff;padding:12px 13px;font:inherit;color:var(--ink)}input:focus{outline:3px solid #006ee125;border-color:var(--blue)}.hint{color:var(--muted);font-size:13px;margin:7px 0 0}.spacer{height:20px}.drop{border:1.5px dashed #aebfd5;background:#f9fbfe;border-radius:13px;padding:23px;text-align:center}.drop .symbol{font-size:28px}.drop strong{display:block;color:var(--navy);margin:5px 0}.drop input{margin-top:12px;max-width:100%}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:0;border-radius:10px;padding:12px 17px;font:inherit;font-weight:750;cursor:pointer}.btn-primary{background:var(--blue);color:white}.btn-primary:hover{background:#0057b8}.btn-primary:disabled{opacity:.55;cursor:wait}.btn-secondary{background:#edf2f8;color:var(--navy)}.note{padding:13px 15px;border-radius:11px;background:#fff8dc;border:1px solid #f4df8c;color:#5e4a00;font-size:13px;margin-top:16px}.status{display:none;padding:13px 15px;border-radius:10px;margin-top:16px;white-space:pre-wrap;overflow-wrap:anywhere}.status.show{display:block}.status.info{background:#eef5ff;color:#17417c}.status.ok{background:#eaf8f0;color:var(--green)}.status.err{background:#fff0ef;color:var(--red)}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.metric{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}.metric strong{display:block;font-size:24px;color:var(--navy)}.metric span{color:var(--muted);font-size:12px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #e8edf4;vertical-align:top}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}code{overflow-wrap:anywhere;color:#244b7c}.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:#e8f7ef;color:var(--green);font-size:12px;font-weight:750}.tag.skip{background:#fff3d5;color:#785600}.tag.fail{background:#fff0ef;color:#b42318}.foot{color:var(--muted);font-size:12px;text-align:center;margin:22px 0 35px}
+    @media(max-width:600px){.wrap{margin:24px auto}.panel{padding:17px}.summary{grid-template-columns:1fr}.hero h1{font-size:29px}}
   </style>
 </head>
-
 <body>
   <main class="wrap">
-
-    <div class="brand">
-      <div class="logo">P</div>
-      <div>
-        <small>Sandbox tools</small>
-        <strong>Paddle Catalog Importer</strong>
-      </div>
-    </div>
-
-    <section class="hero">
-      <h1>Import your product catalog</h1>
-      <p>
-        Upload a CSV once. This page sends the original file to your n8n
-        webhook, where the workflow validates the rows and creates eligible
-        digital products and prices in Paddle Sandbox.
-      </p>
-    </section>
-
+    <div class="brand"><div class="logo">P</div><div><small>Sandbox tools</small><strong>Paddle Catalog Importer</strong></div></div>
+    <section class="hero"><h1>Import your product catalog</h1><p>Upload a CSV once. This page sends the original file to your n8n webhook, where the workflow validates the rows and creates eligible digital products and prices in Paddle Sandbox.</p></section>
     <section class="panel">
-
-      <label class="field" for="webhookUrl">
-        n8n Production Webhook URL
-      </label>
-
-      <input
-        id="webhookUrl"
-        type="url"
-        placeholder="https://your-workspace.app.n8n.cloud/webhook/paddle-csv-provisioner"
-        autocomplete="url"
-        required
-      >
-
-      <p class="hint">
-        Activate your n8n workflow and copy the Production URL from the
-        Provision Webhook node.
-      </p>
-
+      <label class="field" for="webhookUrl">n8n Production Webhook URL</label>
+      <input id="webhookUrl" type="url" placeholder="https://your-workspace.app.n8n.cloud/webhook/paddle-csv-provisioner" autocomplete="url" required>
+      <p class="hint">In n8n, activate the workflow and copy the Production URL from the “Provision Webhook” node.</p>
       <div class="spacer"></div>
-
-      <label class="field" for="csvFile">
-        CSV file
-      </label>
-
-      <div class="drop">
-        <div class="symbol">⇧</div>
-
-        <strong>Choose your product catalog CSV</strong>
-
-        <div class="hint">
-          Expected columns: Product Name, Category, Price, Type
-        </div>
-
-        <input
-          id="csvFile"
-          type="file"
-          accept=".csv,text/csv"
-          required
-        >
-      </div>
-
-      <div class="note">
-        <strong>Sandbox only.</strong>
-        The workflow is designed to skip physical products and import
-        supported digital products. Prices are interpreted as USD.
-        If your CSV has no interval column, prices are one-time.
-      </div>
-
-      <div class="actions">
-        <button id="uploadBtn" class="btn btn-primary" type="button">
-          Upload CSV and create products
-        </button>
-
-        <button id="resetBtn" class="btn btn-secondary" type="button">
-          Reset
-        </button>
-      </div>
-
-      <div
-        id="status"
-        class="status"
-        role="status"
-        aria-live="polite"
-      ></div>
-
+      <label class="field" for="csvFile">CSV file</label>
+      <div class="drop"><div class="symbol">⇧</div><strong>Choose your product catalog CSV</strong><div class="hint">Expected columns: Product Name, Category, Price, Type</div><input id="csvFile" type="file" accept=".csv,text/csv" required></div>
+      <div class="note"><strong>Sandbox only.</strong> The workflow is designed to skip physical products and import supported digital products. Prices are interpreted as USD; if your CSV has no interval column, prices are one-time.</div>
+      <div class="actions"><button id="uploadBtn" class="btn btn-primary" type="button">Upload CSV and create products</button><button id="resetBtn" class="btn btn-secondary" type="button">Reset</button></div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
     </section>
-
     <section id="resultsPanel" class="panel" hidden>
-      <h2 style="margin:0;color:var(--navy);font-size:21px">
-        Import results
-      </h2>
-
+      <h2 style="margin:0;color:var(--navy);font-size:21px">Import results</h2>
       <div id="metrics" class="summary"></div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Status</th>
-              <th>Product ID</th>
-              <th>Price ID</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-
-          <tbody id="resultsBody"></tbody>
-        </table>
-      </div>
-
-      <div class="actions">
-        <button id="downloadBtn" class="btn btn-secondary" type="button">
-          Download results CSV
-        </button>
-      </div>
+      <div class="table-wrap"><table><thead><tr><th>Product</th><th>Status</th><th>Product ID</th><th>Price ID</th><th>Price</th></tr></thead><tbody id="resultsBody"></tbody></table></div>
+      <div class="actions"><button id="downloadBtn" class="btn btn-secondary" type="button">Download results CSV</button></div>
     </section>
-
-    <p class="foot">
-      Paddle Sandbox CSV Importer · Your API key belongs in n8n credentials,
-      never in this page.
-    </p>
-
+    <p class="foot">Paddle Sandbox CSV Importer · Your API key belongs in n8n credentials, never in this page.</p>
   </main>
-
-  <script>
-    (() => {
-      const $ = id => document.getElementById(id);
-
-      const webhook = $("webhookUrl");
-      const fileInput = $("csvFile");
-      const uploadBtn = $("uploadBtn");
-      const statusBox = $("status");
-
-      let lastRows = [];
-
-      function status(message, kind = "info") {
-        statusBox.textContent = message;
-        statusBox.className = `status show ${kind}`;
-      }
-
-      function esc(value) {
-        return String(value ?? "").replace(/[&<>"']/g, c => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[c]));
-      }
-
-      function downloadCSV(rows) {
-        const headers = [
-          "product_name",
-          "status",
-          "product_id",
-          "price_id",
-          "price",
-          "currency",
-          "interval",
-          "message"
-        ];
-
-        const quote = value =>
-          '"' + String(value ?? "").replace(/"/g, '""') + '"';
-
-        const content = [
-          headers.join(","),
-          ...rows.map(row =>
-            headers.map(header => quote(row[header])).join(",")
-          )
-        ].join("\r\n");
-
-        const url = URL.createObjectURL(
-          new Blob([content], {
-            type: "text/csv;charset=utf-8;"
-          })
-        );
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "paddle-import-results.csv";
-
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        URL.revokeObjectURL(url);
-      }
-
-      function render(data) {
-        const results = Array.isArray(data.results)
-          ? data.results
-          : [];
-
-        const skipped = Number(data.skipped_physical || 0);
-
-        $("resultsPanel").hidden = false;
-
-        $("metrics").innerHTML = `
-          <div class="metric">
-            <strong>${Number(data.created ?? results.length)}</strong>
-            <span>Products created</span>
-          </div>
-
-          <div class="metric">
-            <strong>${skipped}</strong>
-            <span>Physical products skipped</span>
-          </div>
-
-          <div class="metric">
-            <strong>${Number(data.failed || 0)}</strong>
-            <span>Failures reported</span>
-          </div>
-        `;
-
-        const rows = results.map(row => ({
-          ...row,
-          status: row.status || "success"
-        }));
-
-        if (Array.isArray(data.skipped_physical_names)) {
-          data.skipped_physical_names.forEach(name => {
-            rows.push({
-              product_name: name,
-              status: "skipped",
-              message: "Physical products are not imported into Paddle"
-            });
-          });
-        }
-
-        lastRows = rows;
-
-        $("resultsBody").innerHTML = rows.map(row => `
-          <tr>
-            <td>${esc(row.product_name)}</td>
-
-            <td>
-              <span class="tag ${
-                row.status === "skipped" ? "skip" : ""
-              }">
-                ${esc(row.status)}
-              </span>
-            </td>
-
-            <td><code>${esc(row.product_id || "—")}</code></td>
-
-            <td><code>${esc(row.price_id || "—")}</code></td>
-
-            <td>
-              ${
-                row.price
-                  ? `${esc(row.currency || "USD")} ${esc(row.price)}`
-                  : "—"
-              }
-              <div class="hint">${esc(row.message || "")}</div>
-            </td>
-          </tr>
-        `).join("") || `
-          <tr>
-            <td colspan="5">The webhook returned no product rows.</td>
-          </tr>
-        `;
-      }
-
-      uploadBtn.addEventListener("click", async () => {
-        const url = webhook.value.trim();
-        const file = fileInput.files && fileInput.files[0];
-
-        if (!url) {
-          return status(
-            "Enter the n8n Production Webhook URL first.",
-            "err"
-          );
-        }
-
-        try {
-          const parsed = new URL(url);
-
-          if (!["http:", "https:"].includes(parsed.protocol)) {
-            throw new Error();
-          }
-        } catch {
-          return status(
-            "Enter a valid HTTP or HTTPS webhook URL.",
-            "err"
-          );
-        }
-
-        if (!file) {
-          return status("Choose a CSV file first.", "err");
-        }
-
-        if (
-          !file.name.toLowerCase().endsWith(".csv") &&
-          file.type !== "text/csv"
-        ) {
-          return status("Please choose a .csv file.", "err");
-        }
-
-        // Send the actual CSV file to n8n as multipart/form-data.
-        // The binary property name expected by the workflow is csvFile.
-        const form = new FormData();
-        form.append("csvFile", file, file.name);
-
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = "Uploading and importing…";
-        $("resultsPanel").hidden = true;
-
-        status(
-          `Sending "${file.name}" (${Math.ceil(file.size / 1024)} KB) to n8n…`,
-          "info"
-        );
-
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            body: form
-          });
-
-          const raw = await response.text();
-
-          let data;
-
-          try {
-            data = JSON.parse(raw);
-          } catch {
-            throw new Error(
-              `n8n returned HTTP ${response.status} but not JSON. ` +
-              `Check the webhook response and workflow execution. ` +
-              raw.slice(0, 500)
-            );
-          }
-
-          if (!response.ok) {
-            throw new Error(
-              data.message ||
-              data.error ||
-              `Request failed with HTTP ${response.status}.`
-            );
-          }
-
-          if (data.status === "error") {
-            throw new Error(
-              data.message || "The workflow reported an error."
-            );
-          }
-
-          render(data);
-
-          status(
-            `Finished. n8n processed the uploaded CSV. ` +
-            `Created: ${data.created ?? (data.results || []).length}; ` +
-            `skipped physical products: ${data.skipped_physical ?? 0}.`,
-            "ok"
-          );
-
-        } catch (err) {
-          status(
-            `Import failed: ${err.message}\n\n` +
-            `If this is a CORS error, configure the webhook node's ` +
-            `Allowed Origins to match this page's origin. Also check ` +
-            `the latest execution in n8n.`,
-            "err"
-          );
-
-        } finally {
-          uploadBtn.disabled = false;
-          uploadBtn.textContent = "Upload CSV and create products";
-        }
-      });
-
-      $("downloadBtn").addEventListener("click", () => {
-        downloadCSV(lastRows);
-      });
-
-      $("resetBtn").addEventListener("click", () => {
-        fileInput.value = "";
-        statusBox.className = "status";
-        statusBox.textContent = "";
-        $("resultsPanel").hidden = true;
-        lastRows = [];
-      });
-    })();
-  </script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const webhook = $('webhookUrl'), fileInput = $('csvFile'), uploadBtn = $('uploadBtn'), statusBox = $('status');
+  let lastRows = [];
+  function status(message, kind='info') { statusBox.textContent = message; statusBox.className = `status show ${kind}`; }
+  function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function downloadCSV(rows) {
+    const headers = ['product_name','status','product_id','price_id','price','currency','interval','message'];
+    const quote = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const content = [headers.join(','), ...rows.map(r => headers.map(h => quote(r[h])).join(','))].join('\r\n');
+    const url = URL.createObjectURL(new Blob([content], {type:'text/csv;charset=utf-8;'}));
+    const a = document.createElement('a'); a.href = url; a.download = 'paddle-import-results.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+  function render(data) {
+    const results = Array.isArray(data.results) ? data.results : [];
+    const skipped = Number(data.skipped_physical || 0);
+    $('resultsPanel').hidden = false;
+    $('metrics').innerHTML = `<div class="metric"><strong>${Number(data.created ?? results.length)}</strong><span>Products created</span></div><div class="metric"><strong>${skipped}</strong><span>Physical products skipped</span></div><div class="metric"><strong>${Number(data.failed || 0)}</strong><span>Failures reported</span></div>`;
+    const rows = results.map(r => ({...r, status:r.status || 'success'}));
+    if (Array.isArray(data.skipped_physical_names)) data.skipped_physical_names.forEach(name => rows.push({product_name:name,status:'skipped',message:'Physical products are not imported into Paddle'}));
+    lastRows = rows;
+    $('resultsBody').innerHTML = rows.map(r => `<tr><td>${esc(r.product_name)}</td><td><span class="tag ${r.status==='skipped'?'skip':(r.status==='failed'?'fail':'')}">${esc(r.status)}</span></td><td><code>${esc(r.product_id || '—')}</code></td><td><code>${esc(r.price_id || '—')}</code></td><td>${r.price ? `${esc(r.currency || 'USD')} ${esc(r.price)}` : '—'}<div class="hint">${esc(r.message || '')}</div></td></tr>`).join('') || '<tr><td colspan="5">The webhook returned no product rows.</td></tr>';
+  }
+  uploadBtn.addEventListener('click', async () => {
+    const url = webhook.value.trim(), file = fileInput.files && fileInput.files[0];
+    if (!url) return status('Enter the n8n Production Webhook URL first.', 'err');
+    try { const parsed = new URL(url); if (!['http:','https:'].includes(parsed.protocol)) throw new Error(); }
+    catch { return status('Enter a valid http or https webhook URL.', 'err'); }
+    if (!file) return status('Choose a CSV file first.', 'err');
+    if (!file.name.toLowerCase().endsWith('.csv') && file.type !== 'text/csv') return status('Please choose a .csv file.', 'err');
+    const form = new FormData(); form.append('csvFile', file, file.name);
+    uploadBtn.disabled = true; uploadBtn.textContent = 'Uploading and importing…'; $('resultsPanel').hidden = true;
+    status(`Sending “${file.name}” (${Math.ceil(file.size/1024)} KB) to n8n…`, 'info');
+    try {
+      const response = await fetch(url, {method:'POST', body:form});
+      const raw = await response.text();
+      let data; try { data = JSON.parse(raw); } catch { throw new Error(`n8n returned HTTP ${response.status} but not JSON. Check the webhook response and workflow execution. ${raw.slice(0,500)}`); }
+      if (!response.ok) throw new Error(data.message || data.error || `Request failed with HTTP ${response.status}.`);
+      if (data.status === 'error') throw new Error(data.message || 'The workflow reported an error.');
+      render(data);
+      status(`${data.failed ? 'Import completed with errors.' : 'Import finished.'} Created: ${data.created ?? (data.results || []).length}; failed: ${data.failed ?? 0}; skipped physical products: ${data.skipped_physical ?? 0}.`, data.failed ? 'err' : 'ok');
+    } catch (err) {
+      status(`Import failed: ${err.message}\n\nIf this is a CORS error, set the webhook node’s Allowed Origins to this page’s exact origin and ensure the Respond to Upload node returns the same origin. Also check the latest execution in n8n.`, 'err');
+    } finally { uploadBtn.disabled = false; uploadBtn.textContent = 'Upload CSV and create products'; }
+  });
+  $('downloadBtn').addEventListener('click', () => downloadCSV(lastRows));
+  $('resetBtn').addEventListener('click', () => { fileInput.value=''; statusBox.className='status'; statusBox.textContent=''; $('resultsPanel').hidden=true; lastRows=[]; });
+})();
+</script>
 </body>
 </html>
